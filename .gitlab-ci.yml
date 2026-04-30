@@ -1,0 +1,7 @@
+stages:
+  - test
+
+job_demo:
+  stage: test
+  script:
+    - echo "Pipeline funcionando en GitLab CI/CD 🚀"

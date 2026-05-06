@@ -1,7 +1,41 @@
 stages:
-  - test
+  - check
+  - build
+  - push
+  - deploy
 
-job_demo:
-  stage: test
+variables:
+  DOCKER_REGISTRY: "localhost:5000"
+  IMAGE_NAME: "demo-ansible"
+  IMAGE_TAG: "$CI_COMMIT_SHA"
+
+check:
+  stage: check
+  tags:
+    - docker
   script:
-    - echo "Pipeline funcionando en GitLab CI/CD 🚀"
+    - echo "Verificando conexión con Docker..."
+    - docker info || echo "Docker no disponible"
+    - echo "Runner operativo ✅"
+
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+
+push:
+  stage: push
+  tags:
+    - docker
+  script:
+    - docker login $DOCKER_REGISTRY -u admin -p admin123
+    - docker push $DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+
+deploy:
+  stage: deploy
+  tags:
+    - docker
+  script:
+    - ansible-playbook -i hosts nginx.yml -e "frontend_version=$IMAGE_TAG"

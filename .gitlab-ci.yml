@@ -16,7 +16,7 @@ check:
   script:
     - echo "Verificando conexión con Docker..."
     - docker info || echo "Docker no disponible"
-    - echo "Runner operativo ✅"
+    - echo "Runner operativo"
 
 build:
   stage: build

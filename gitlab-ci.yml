@@ -1,0 +1,25 @@
+stages:
+  - build
+  - push
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: "localhost:5000"
+  IMAGE_NAME: "demo-ansible"
+  IMAGE_TAG: "$CI_COMMIT_SHA"
+
+build:
+  stage: build
+  script:
+    - docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+
+push:
+  stage: push
+  script:
+    - docker login $DOCKER_REGISTRY -u admin -p admin123
+    - docker push $DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+
+deploy:
+  stage: deploy
+  script:
+    - ansible-playbook -i hosts nginx.yml -e "frontend_version=$IMAGE_TAG"
